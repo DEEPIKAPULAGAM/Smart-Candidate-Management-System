@@ -1,18 +1,36 @@
-## Getting Started
+# Smart Candidate Management System
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+## Overview
+A menu-driven Java application that manages candidate records using JDBC and MySQL.
 
-## Folder Structure
+## Technologies Used
+- Java
+- JDBC
+- MySQL
+- VS Code
 
-The workspace contains two folders by default, where:
+## Features
+- Add Candidate
+- View All Candidates
+- Search Candidate by ID
+- Search Candidate by Name
+- Update Candidate
+- Delete Candidate
+- Filter Candidates by CGPA
+- Sort Candidates by CGPA
+- Search Candidate by Skill
+- Display Total Candidates
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
+## Concepts Used
+- Object-Oriented Programming
+- JDBC
+- DAO Design Pattern
+- PreparedStatement
+- ResultSet
+- CRUD Operations
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
+## Database
+MySQL
 
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+## Author
+Deepika Pulagam
