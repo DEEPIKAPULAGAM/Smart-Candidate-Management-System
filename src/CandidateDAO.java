@@ -1,8 +1,6 @@
 import java.sql.SQLException;
 import java.util.List;
 
-// DAO stands for Data Access Object
-// Abstraction: defines database operations without exposing implementation
 public interface CandidateDAO {
 
     // Insert a new candidate
