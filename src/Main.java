@@ -1,16 +1,17 @@
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
-
         Scanner sc = new Scanner(System.in);
-        CandidateDAO dao = new CandidateDAO();
+        CandidateDAO dao = new CandidateDAOImpl();
 
         int choice;
 
         do {
-
             System.out.println("\n=========================================");
             System.out.println(" Smart Candidate Management System");
             System.out.println("=========================================");
@@ -27,203 +28,343 @@ public class Main {
             System.out.println("11. Exit");
             System.out.print("Enter your choice: ");
 
-            choice = sc.nextInt();
-            sc.nextLine();
+            choice = readInt(sc);
 
-            switch (choice) {
+            try {
+                switch (choice) {
+                    case 1: {
+                        String name = readRequiredText(sc, "Enter Name: ");
+                        String email = readValidEmail(sc);
 
-                case 1: {
+                        System.out.print("Enter Phone: ");
+                        String phone = sc.nextLine().trim();
 
-                    System.out.print("Enter Name: ");
-                    String name = sc.nextLine();
+                        System.out.print("Enter College: ");
+                        String college = sc.nextLine().trim();
 
-                    System.out.print("Enter Email: ");
-                    String email = sc.nextLine();
+                        System.out.print("Enter Branch: ");
+                        String branch = sc.nextLine().trim();
 
-                    System.out.print("Enter Phone: ");
-                    String phone = sc.nextLine();
+                        int graduationYear = readValidGraduationYear(sc);
+                        double cgpa = readValidCGPA(sc);
 
-                    System.out.print("Enter College: ");
-                    String college = sc.nextLine();
+                        System.out.print("Enter Skills: ");
+                        String skills = sc.nextLine().trim();
 
-                    System.out.print("Enter Branch: ");
-                    String branch = sc.nextLine();
+                        int experienceYears = readValidExperience(sc);
 
-                    System.out.print("Enter Graduation Year: ");
-                    int graduationYear = sc.nextInt();
+                        Candidate candidate = new Candidate(
+                                name,
+                                email,
+                                phone,
+                                college,
+                                branch,
+                                graduationYear,
+                                cgpa,
+                                skills,
+                                experienceYears
+                        );
 
-                    System.out.print("Enter CGPA: ");
-                    double cgpa = sc.nextDouble();
-                    sc.nextLine();
+                        if (dao.addCandidate(candidate)) {
+                            System.out.println("Candidate Added Successfully!");
+                        } else {
+                            System.out.println("Failed to Add Candidate!");
+                        }
 
-                    System.out.print("Enter Skills: ");
-                    String skills = sc.nextLine();
+                        break;
+                    }
 
-                    System.out.print("Enter Experience Years: ");
-                    int experienceYears = sc.nextInt();
+                    case 2: {
+                        printCandidates(dao.getAllCandidates());
+                        
+                        break;
+                    }
 
-                    Candidate candidate = new Candidate(
-                            name,
-                            email,
-                            phone,
-                            college,
-                            branch,
-                            graduationYear,
-                            cgpa,
-                            skills,
-                            experienceYears
-                    );
+                    case 3: {
+                        System.out.print("Enter Candidate ID: ");
+                        int id = readInt(sc);
 
-                    if (dao.addCandidate(candidate))
-                        System.out.println("Candidate Added Successfully!");
-                    else
-                        System.out.println("Failed to Add Candidate!");
+                        Candidate candidate = dao.searchCandidate(id);
 
-                    break;
+                        if (candidate != null) {
+                            System.out.println(candidate);
+                        } else {
+                            System.out.println("Candidate Not Found!");
+                        }
+
+                        break;
+                    }
+
+                    case 4: {
+                        System.out.print("Enter Candidate Name: ");
+                        String name = readRequiredText(sc, "Enter Candidate Name: ");
+                        
+                        printCandidates(dao.searchCandidateByName(name));
+                        break;
+                    }
+
+                    case 5: {
+                        System.out.print("Enter Candidate ID: ");
+                        int id = readInt(sc);
+
+                        Candidate existingCandidate = dao.searchCandidate(id);
+
+                        if (existingCandidate == null) {
+                            System.out.println("Candidate Not Found!");
+                            break;
+                        }
+
+                        System.out.println("Which field do you want to update?");
+                        System.out.println("1. Name");
+                        System.out.println("2. Email");
+                        System.out.println("3. Phone");
+                        System.out.println("4. College");
+                        System.out.println("5. Branch");
+                        System.out.println("6. Graduation Year");
+                        System.out.println("7. CGPA");
+                        System.out.println("8. Skills");
+                        System.out.println("9. Experience Years");
+                        System.out.print("Enter your choice: ");
+
+                        int fieldChoice = readInt(sc);
+
+                        if (fieldChoice < 1 || fieldChoice > 9) {
+                            System.out.println("Invalid field choice!");
+                            break;
+                        }
+
+                        Object newValue = null;
+
+                        switch (fieldChoice) {
+                            case 1:
+                                newValue = readRequiredText(sc, "Enter new name: ");
+                                break;
+
+                            case 2:
+                                newValue = readValidEmail(sc);
+                                break;
+
+                            case 3:
+                                System.out.print("Enter new phone: ");
+                                newValue = sc.nextLine().trim();
+                                break;
+
+                            case 4:
+                                System.out.print("Enter new college: ");
+                                newValue = sc.nextLine().trim();
+                                break;
+
+                            case 5:
+                                System.out.print("Enter new branch: ");
+                                newValue = sc.nextLine().trim();
+                                break;
+
+                            case 6:
+                                newValue = readValidGraduationYear(sc);
+                                break;
+
+                            case 7:
+                                newValue = readValidCGPA(sc);
+                                break;
+
+                            case 8:
+                                System.out.print("Enter new skills: ");
+                                newValue = sc.nextLine().trim();
+                                break;
+
+                            case 9:
+                                newValue = readValidExperience(sc);
+                                break;
+
+                            default:
+                                System.out.println("Invalid field choice!");
+                                break;
+                        }
+                        if (newValue == null) {
+                            System.out.println("Invalid field choice!");
+                            break;
+                        }
+
+                        if (dao.updateCandidateField(id, fieldChoice, newValue)) {
+                            System.out.println("Candidate Updated Successfully!");
+                        } else {
+                            System.out.println("Candidate Not Found!");
+                        }
+
+                        break;
+                    }
+
+                    case 6: {
+                        System.out.print("Enter Candidate ID: ");
+                        int id = readInt(sc);
+
+                        if (dao.deleteCandidate(id)) {
+                            System.out.println("Candidate Deleted Successfully!");
+                        } else {
+                            System.out.println("Candidate Not Found!");
+                        }
+
+                        break;
+                    }
+
+                    case 7: {
+                        double cgpa = readValidCGPA(sc);
+                        printCandidates(dao.filterByCGPA(cgpa));
+                        break;
+                    }
+
+                    case 8: {
+                        printCandidates(dao.sortByCGPA());
+                        break;
+                    }
+
+                    case 9: {
+                        System.out.println(
+                                "Total Candidates: " + dao.getTotalCandidates()
+                        );
+                        break;
+                    }
+
+                    case 10: {
+                        System.out.print(
+                                "Enter skill(s), separated by commas (example: Java, Python): "
+                        );
+                        String skills = sc.nextLine().trim();
+
+                        printCandidates(dao.searchCandidateBySkill(skills));
+                        break;
+                    }
+
+                    case 11: {
+                        System.out.println("Thank You!");
+                        break;
+                    }
+
+                    default: {
+                        System.out.println("Invalid Choice!");
+                    }
                 }
-
-                case 2: {
-
-                    dao.viewAllCandidates();
-                    break;
-                }
-
-                case 3: {
-
-                    System.out.print("Enter Candidate ID: ");
-                    int id = sc.nextInt();
-
-                    dao.searchCandidate(id);
-
-                    break;
-                }
-
-                case 4: {
-
-                    System.out.print("Enter Candidate Name: ");
-                    String name = sc.nextLine();
-
-                    dao.searchCandidateByName(name);
-
-                    break;
-                }
-
-                case 5: {
-
-                    System.out.print("Enter Candidate ID: ");
-                    int id = sc.nextInt();
-                    sc.nextLine();
-
-                    System.out.print("Enter Name: ");
-                    String name = sc.nextLine();
-
-                    System.out.print("Enter Email: ");
-                    String email = sc.nextLine();
-
-                    System.out.print("Enter Phone: ");
-                    String phone = sc.nextLine();
-
-                    System.out.print("Enter College: ");
-                    String college = sc.nextLine();
-
-                    System.out.print("Enter Branch: ");
-                    String branch = sc.nextLine();
-
-                    System.out.print("Enter Graduation Year: ");
-                    int graduationYear = sc.nextInt();
-
-                    System.out.print("Enter CGPA: ");
-                    double cgpa = sc.nextDouble();
-                    sc.nextLine();
-
-                    System.out.print("Enter Skills: ");
-                    String skills = sc.nextLine();
-
-                    System.out.print("Enter Experience Years: ");
-                    int experienceYears = sc.nextInt();
-
-                    Candidate candidate = new Candidate(
-                            id,
-                            name,
-                            email,
-                            phone,
-                            college,
-                            branch,
-                            graduationYear,
-                            cgpa,
-                            skills,
-                            experienceYears
-                    );
-
-                    if (dao.updateCandidate(candidate))
-                        System.out.println("Candidate Updated Successfully!");
-                    else
-                        System.out.println("Candidate Not Found!");
-
-                    break;
-                }
-
-                case 6: {
-
-                    System.out.print("Enter Candidate ID: ");
-                    int id = sc.nextInt();
-
-                    if (dao.deleteCandidate(id))
-                        System.out.println("Candidate Deleted Successfully!");
-                    else
-                        System.out.println("Candidate Not Found!");
-
-                    break;
-                }
-
-                case 7: {
-
-                    System.out.print("Enter Minimum CGPA: ");
-                    double cgpa = sc.nextDouble();
-
-                    dao.filterByCGPA(cgpa);
-
-                    break;
-                }
-
-                case 8: {
-
-                    dao.sortByCGPA();
-
-                    break;
-                }
-
-                case 9: {
-
-                    System.out.println("Total Candidates : " + dao.getTotalCandidates());
-
-                    break;
-                }
-
-                case 10: {
-
-                    System.out.print("Enter Skill: ");
-                    String skill = sc.nextLine();
-
-                    dao.searchCandidateBySkill(skill);
-
-                    break;
-                }
-
-                case 11: {
-
-                    System.out.println("Thank You!");
-                    break;
-                }
-
-                default:
-
-                    System.out.println("Invalid Choice!");
-
+            } catch (SQLIntegrityConstraintViolationException e) {
+                System.out.println(
+                        "A candidate with this email already exists!"
+                );
+            } catch (SQLException e) {
+                System.out.println("Database error: " + e.getMessage());
             }
-
         } while (choice != 11);
 
         sc.close();
+    }
+
+    private static void printCandidates(List<Candidate> candidates) {
+        if (candidates.isEmpty()) {
+            System.out.println("No Candidates Found!");
+            return;
+        }
+
+        for (Candidate candidate : candidates) {
+            System.out.println(candidate);
+            System.out.println("------------------------------");
+        }
+    }
+
+    private static String readRequiredText(Scanner sc, String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String value = sc.nextLine().trim();
+
+            if (!value.isEmpty()) {
+                return value;
+            }
+
+            System.out.println("This field is required.");
+        }
+    }
+
+    private static String readValidEmail(Scanner sc) {
+        while (true) {
+            String email = readRequiredText(sc, "Enter Email: ");
+
+            if (email.matches(
+                    "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+            )) {
+                return email;
+            }
+
+            System.out.println("Invalid email format. Please try again.");
+        }
+    }
+
+    private static int readInt(Scanner sc) {
+        while (true) {
+            String input = sc.nextLine().trim();
+
+            try {
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.print(
+                        "Invalid input! Please enter a whole number: "
+                );
+            }
+        }
+    }
+
+    private static double readDouble(Scanner sc) {
+        while (true) {
+            String input = sc.nextLine().trim();
+
+            try {
+                double value = Double.parseDouble(input);
+
+                if (Double.isFinite(value)) {
+                    return value;
+                }
+            } catch (NumberFormatException e) {
+                // Ask for another value below.
+            }
+
+            System.out.print("Invalid input! Please enter a number: ");
+        }
+    }
+
+    private static double readValidCGPA(Scanner sc) {
+        while (true) {
+            System.out.print("Enter CGPA (0-10): ");
+            double cgpa = readDouble(sc);
+
+            if (cgpa >= 0 && cgpa <= 10) {
+                return cgpa;
+            }
+
+            System.out.println(
+                    "Invalid CGPA! Please enter a value between 0 and 10."
+            );
+        }
+    }
+
+    private static int readValidExperience(Scanner sc) {
+        while (true) {
+            System.out.print("Enter Experience Years: ");
+            int experience = readInt(sc);
+
+            if (experience >= 0) {
+                return experience;
+            }
+
+            System.out.println("Experience cannot be negative!");
+        }
+    }
+
+    private static int readValidGraduationYear(Scanner sc) {
+        while (true) {
+            System.out.print("Enter Graduation Year: ");
+            int year = readInt(sc);
+
+            if (year >= 2021 && year <= 2027) {
+                return year;
+            }
+
+            System.out.println("Invalid graduation year!");
+        }
     }
 }

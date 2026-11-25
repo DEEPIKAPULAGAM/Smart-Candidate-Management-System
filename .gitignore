@@ -1,3 +1,9 @@
+# Compiled Java files
 bin/
-.vscode/
 *.class
+
+# Local secrets
+.env
+
+# VS Code settings
+.vscode/

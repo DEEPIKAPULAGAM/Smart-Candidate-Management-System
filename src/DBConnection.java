@@ -4,24 +4,23 @@ import java.sql.SQLException;
 
 public class DBConnection {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/candidatedb";
-    private static final String USER = "root";
-    private static final String PASSWORD = "Deepika@2020";
+    private static final String URL =
+            "jdbc:mysql://localhost:3306/candidatedb";
 
-    public static Connection getConnection() {
+    private static final String USER =
+            System.getenv("DB_USER");
 
-        try {
-            System.out.println(com.mysql.cj.jdbc.Driver.class.getName());
-            
-            Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println("Connected Successfully!");
-            return con;
-        }
-        catch(SQLException e) {
-            System.out.println("Connection Failed!");
-            e.printStackTrace();
-            return null;
+    private static final String PASSWORD =
+            System.getenv("DB_PASSWORD");
+
+    public static Connection getConnection() throws SQLException {
+        if (USER == null || USER.trim().isEmpty() || PASSWORD == null) {
+            throw new SQLException(
+                    "Database credentials are not configured. " +
+                    "Set DB_USER and DB_PASSWORD."
+            );
         }
 
+        return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 }

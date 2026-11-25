@@ -16,7 +16,7 @@ public class Candidate{
     private int experienceYears;
 
     public Candidate() {
-        //Default constructor
+        //Default constructor   
     }
     
     // Constructor for retrieving data from database
@@ -123,18 +123,16 @@ public class Candidate{
     //why use toString() -> when we want to view all candidates instead of writing s.o.p(candidate.getCga), s.o.p(candidate.getName)... we can directly write s.o.p(candidate)
     @Override
     public String toString() {
-        return "Candidate{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", phone='" + phone + '\'' +
-                ", college='" + college + '\'' +
-                ", branch='" + branch + '\'' +
-                ", graduationYear=" + graduationYear +
-                ", cgpa=" + cgpa +
-                ", skills='" + skills + '\'' +
-                ", experienceYears=" + experienceYears +
-                '}';
+        return "Candidate ID: " + id +
+                "\nName: " + name +
+                "\nEmail: " + email +
+                "\nPhone: " + phone +
+                "\nCollege: " + college +
+                "\nBranch: " + branch +
+                "\nGraduation Year: " + graduationYear +
+                "\nCGPA: " + cgpa +
+                "\nSkills: " + skills +
+                "\nExperience: " + experienceYears + " years";
     }
 
 }
