@@ -7,10 +7,13 @@ public class Main {
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
+
+        // Using DAO interface so Main doesn't need to know the database logic
         CandidateDAO dao = new CandidateDAOImpl();
 
         int choice;
 
+        // Display the menu repeatedly until the user chooses exit
         do {
             System.out.println("\n=========================================");
             System.out.println(" Smart Candidate Management System");
@@ -53,6 +56,7 @@ public class Main {
 
                         int experienceYears = readValidExperience(sc);
 
+                        // Using constructor without ID as ID is generated in the database
                         Candidate candidate = new Candidate(
                                 name,
                                 email,
@@ -76,7 +80,7 @@ public class Main {
 
                     case 2: {
                         printCandidates(dao.getAllCandidates());
-                        
+
                         break;
                     }
 
@@ -98,7 +102,7 @@ public class Main {
                     case 4: {
                         System.out.print("Enter Candidate Name: ");
                         String name = readRequiredText(sc, "Enter Candidate Name: ");
-                        
+
                         printCandidates(dao.searchCandidateByName(name));
                         break;
                     }
@@ -107,6 +111,7 @@ public class Main {
                         System.out.print("Enter Candidate ID: ");
                         int id = readInt(sc);
 
+                        // First check if the candidate exists before updating
                         Candidate existingCandidate = dao.searchCandidate(id);
 
                         if (existingCandidate == null) {
@@ -133,6 +138,7 @@ public class Main {
                             break;
                         }
 
+                        // Object is used because the new value can be String, int or double
                         Object newValue = null;
 
                         switch (fieldChoice) {
@@ -180,6 +186,7 @@ public class Main {
                                 System.out.println("Invalid field choice!");
                                 break;
                         }
+
                         if (newValue == null) {
                             System.out.println("Invalid field choice!");
                             break;
@@ -244,10 +251,14 @@ public class Main {
                         System.out.println("Invalid Choice!");
                     }
                 }
+
+            // Handles constraint violations like duplicate email
             } catch (SQLIntegrityConstraintViolationException e) {
                 System.out.println(
                         "A candidate with this email already exists!"
                 );
+
+            // Handles other database errors without stopping the program
             } catch (SQLException e) {
                 System.out.println("Database error: " + e.getMessage());
             }
@@ -256,6 +267,7 @@ public class Main {
         sc.close();
     }
 
+    // Common method to display candidates instead of repeating the loop in every case
     private static void printCandidates(List<Candidate> candidates) {
         if (candidates.isEmpty()) {
             System.out.println("No Candidates Found!");
@@ -263,11 +275,13 @@ public class Main {
         }
 
         for (Candidate candidate : candidates) {
+            // This internally calls toString() from Candidate class
             System.out.println(candidate);
             System.out.println("------------------------------");
         }
     }
 
+    // Used for fields that should not be empty
     private static String readRequiredText(Scanner sc, String prompt) {
         while (true) {
             System.out.print(prompt);
@@ -285,6 +299,7 @@ public class Main {
         while (true) {
             String email = readRequiredText(sc, "Enter Email: ");
 
+            // Regex is used to check the email format
             if (email.matches(
                     "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
             )) {
@@ -295,8 +310,10 @@ public class Main {
         }
     }
 
+    // Keep asking for input until the user enters a valid integer
     private static int readInt(Scanner sc) {
         while (true) {
+            // Using nextLine instead of nextInt to avoid newline issues
             String input = sc.nextLine().trim();
 
             try {
@@ -316,11 +333,12 @@ public class Main {
             try {
                 double value = Double.parseDouble(input);
 
+                // isFinite is used to avoid values like NaN and Infinity
                 if (Double.isFinite(value)) {
                     return value;
                 }
             } catch (NumberFormatException e) {
-                // Ask for another value below.
+                // Ask for input again
             }
 
             System.out.print("Invalid input! Please enter a number: ");
