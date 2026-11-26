@@ -39,8 +39,7 @@ public class Main {
                         String name = readRequiredText(sc, "Enter Name: ");
                         String email = readValidEmail(sc);
 
-                        System.out.print("Enter Phone: ");
-                        String phone = sc.nextLine().trim();
+                        String phone = readValidPhone(sc);
 
                         System.out.print("Enter College: ");
                         String college = sc.nextLine().trim();
@@ -100,7 +99,6 @@ public class Main {
                     }
 
                     case 4: {
-                        System.out.print("Enter Candidate Name: ");
                         String name = readRequiredText(sc, "Enter Candidate Name: ");
 
                         printCandidates(dao.searchCandidateByName(name));
@@ -129,9 +127,39 @@ public class Main {
                         System.out.println("7. CGPA");
                         System.out.println("8. Skills");
                         System.out.println("9. Experience Years");
+                        System.out.println("10. Update All Details");
                         System.out.print("Enter your choice: ");
 
                         int fieldChoice = readInt(sc);
+
+                        if (fieldChoice == 10) {
+
+                            // Read all the new candidate details
+                            String name = readRequiredText(sc, "Enter Name: ");
+                            String email = readValidEmail(sc);
+                            String phone = readValidPhone(sc);
+                            String college = readRequiredText(sc, "Enter College: ");
+                            String branch = readRequiredText(sc, "Enter Branch: ");
+
+                            int graduationYear = readValidGraduationYear(sc);
+                            double cgpa = readValidCGPA(sc);
+
+                            String skills = readRequiredText(sc, "Enter Skills: ");
+                            int experienceYears = readValidExperience(sc);
+
+                            Candidate candidate = new Candidate(
+                                    id, name, email, phone, college, branch,
+                                    graduationYear, cgpa, skills, experienceYears
+                            );
+
+                            if (dao.updateCandidate(candidate)) {
+                                System.out.println("Candidate details updated successfully!");
+                            } else {
+                                System.out.println("Candidate not found or update failed.");
+                            }
+
+                            break;
+                        }
 
                         if (fieldChoice < 1 || fieldChoice > 9) {
                             System.out.println("Invalid field choice!");
@@ -151,8 +179,7 @@ public class Main {
                                 break;
 
                             case 3:
-                                System.out.print("Enter new phone: ");
-                                newValue = sc.nextLine().trim();
+                                newValue = readValidPhone(sc);
                                 break;
 
                             case 4:
@@ -307,6 +334,19 @@ public class Main {
             }
 
             System.out.println("Invalid email format. Please try again.");
+        }
+    }
+
+    private static String readValidPhone(Scanner sc) {
+        while (true) {
+            String phone = readRequiredText(sc, "Enter Phone: ");
+
+            // Check if the phone number has 10 digits and starts with 6-9
+            if (phone.matches("[6-9][0-9]{9}")) {
+                return phone;
+            }
+
+            System.out.println("Invalid phone number! Enter a valid 10-digit mobile number.");
         }
     }
 
